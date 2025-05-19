@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { 
@@ -22,6 +22,113 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/de';
+import SignatureCanvas from 'react-signature-canvas';
+
+// Signature field component
+const SignatureField = ({ label, value, onChange, error, helperText }) => {
+  const sigCanvasRef = useRef(null);
+  const [isEmpty, setIsEmpty] = useState(true);
+  
+  // Fallback to text field if SignatureCanvas is not available
+  // Remove this check when the package is properly installed
+  const SignatureCanvasFallback = ({ ref, ...props }) => (
+    <div 
+      ref={ref}
+      style={{ 
+        width: '100%', 
+        height: 120, 
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+        position: 'relative',
+        marginBottom: '8px',
+        backgroundColor: '#f8f8f8'
+      }}
+      {...props}
+    >
+      <div style={{ 
+        position: 'absolute', 
+        top: '50%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        color: '#999',
+        fontStyle: 'italic'
+      }}>
+        Signaturfeld (Hier klicken und zeichnen)
+      </div>
+    </div>
+  );
+  
+  // Use the actual component or fallback
+  const SignatureComponent = typeof SignatureCanvas !== 'undefined' 
+    ? SignatureCanvas 
+    : SignatureCanvasFallback;
+  
+  const handleClear = () => {
+    if (sigCanvasRef.current && sigCanvasRef.current.clear) {
+      sigCanvasRef.current.clear();
+      setIsEmpty(true);
+      onChange('');
+    }
+  };
+  
+  const handleEnd = () => {
+    if (sigCanvasRef.current) {
+      if (sigCanvasRef.current.isEmpty && sigCanvasRef.current.isEmpty()) {
+        setIsEmpty(true);
+        onChange('');
+      } else {
+        setIsEmpty(false);
+        // When using the actual SignatureCanvas, this will get the data URL
+        if (sigCanvasRef.current.toDataURL) {
+          const signatureData = sigCanvasRef.current.toDataURL();
+          onChange(signatureData);
+        } else {
+          // Fallback for our mock component
+          onChange('signature-data-placeholder');
+        }
+      }
+    }
+  };
+  
+  return (
+    <div>
+      <Typography variant="body1" gutterBottom>{label}</Typography>
+      <SignatureComponent
+        ref={sigCanvasRef}
+        penColor="black"
+        canvasProps={{
+          width: '100%',
+          height: 120,
+          className: error ? 'signature-pad-error' : 'signature-pad'
+        }}
+        onEnd={handleEnd}
+      />
+      {error && <Typography color="error" variant="caption">{helperText}</Typography>}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+        <Button 
+          size="small" 
+          variant="outlined" 
+          onClick={handleClear}
+          disabled={isEmpty}
+        >
+          Löschen
+        </Button>
+      </div>
+      
+      {/* Note: style jsx requires the styled-jsx package */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .signature-pad {
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+        .signature-pad-error {
+          border: 1px solid #d32f2f;
+          border-radius: 4px;
+        }
+      `}} />
+    </div>
+  );
+};
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required('Vorname ist erforderlich'),
@@ -448,7 +555,7 @@ const RegistrationForm = ({ onSubmit, loading, error }) => {
 
         {/* Unterschriftenfelder */}
         <Grid container spacing={3} sx={{ mb: 5 }}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <TextField
               fullWidth
               id="place"
@@ -480,30 +587,22 @@ const RegistrationForm = ({ onSubmit, loading, error }) => {
             />
             <Typography variant="caption">Ort, Datum</Typography>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              id="signature"
-              name="signature"
+          <Grid item xs={12} sm={4.5}>
+            <SignatureField
               label="Unterschrift des Neumitgliedes"
-              variant="standard"
-              value={formik.values.signature || ''}
-              onChange={formik.handleChange}
+              value={formik.values.signature}
+              onChange={(value) => formik.setFieldValue('signature', value)}
               error={formik.touched.signature && Boolean(formik.errors.signature)}
               helperText={formik.touched.signature && formik.errors.signature}
-              sx={{}}
-              required
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              id="parentSignature"
-              name="parentSignature"
+          <Grid item xs={12} sm={4.5}>
+            <SignatureField
               label="Unterschrift der Eltern (bei Minderjährigen)"
-              variant="standard"
-              value={formik.values.parentSignature || ''}
-              onChange={formik.handleChange}
+              value={formik.values.parentSignature}
+              onChange={(value) => formik.setFieldValue('parentSignature', value)}
+              error={formik.touched.parentSignature && Boolean(formik.errors.parentSignature)}
+              helperText={formik.touched.parentSignature && formik.errors.parentSignature}
             />
           </Grid>
         </Grid>
