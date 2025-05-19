@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { 
@@ -90,19 +90,41 @@ const SignatureField = ({ label, value, onChange, error, helperText }) => {
     }
   };
   
+  // This effect ensures the canvas size is set correctly
+  useEffect(() => {
+    if (sigCanvasRef.current && sigCanvasRef.current.getCanvas) {
+      const canvas = sigCanvasRef.current.getCanvas();
+      if (canvas) {
+        // Force a resize to set the internal canvas dimensions correctly
+        const parentWidth = canvas.parentElement.clientWidth;
+        canvas.width = parentWidth;
+        canvas.height = 120;
+        
+        // If we have previous data, redraw it
+        if (value && sigCanvasRef.current.fromDataURL) {
+          sigCanvasRef.current.fromDataURL(value);
+        }
+      }
+    }
+  }, [value]);
+  
   return (
     <div>
       <Typography variant="body1" gutterBottom>{label}</Typography>
-      <SignatureComponent
-        ref={sigCanvasRef}
-        penColor="black"
-        canvasProps={{
-          width: '100%',
-          height: 120,
-          className: error ? 'signature-pad-error' : 'signature-pad'
-        }}
-        onEnd={handleEnd}
-      />
+      <div style={{ width: '100%', position: 'relative' }}>
+        <SignatureComponent
+          ref={sigCanvasRef}
+          penColor="black"
+          canvasProps={{
+            className: error ? 'signature-pad-error' : 'signature-pad',
+            style: { 
+              width: '100%', 
+              height: '120px'
+            }
+          }}
+          onEnd={handleEnd}
+        />
+      </div>
       {error && <Typography color="error" variant="caption">{helperText}</Typography>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
         <Button 

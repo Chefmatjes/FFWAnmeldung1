@@ -655,37 +655,105 @@ namespace Server.Controllers
                 Cell memberSignatureCell = new Cell(1, 1)
                     .SetBorder(Border.NO_BORDER)
                     .SetPadding(0);
-                memberSignatureCell.Add(new Paragraph(model?.Signature ?? "")
-                    .SetFontSize(11)
-                    .SetMarginBottom(0));
+                
+                // Check if the signature is a base64 string
+                if (model?.Signature != null && model.Signature.StartsWith("data:image"))
+                {
+                    try
+                    {
+                        // Extract the base64 data part
+                        string base64Data = model.Signature.Split(',')[1];
+                        byte[] signatureBytes = Convert.FromBase64String(base64Data);
+                        
+                        // Create an image from the signature bytes
+                        Image signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
+                            .SetWidth(150)  // Set width to match the cell width
+                            .SetMarginBottom(2);
+                        
+                        memberSignatureCell.Add(signatureImage);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing signature image");
+                        // Fallback to text if there's an error
+                        memberSignatureCell.Add(new Paragraph("Unterschrift digital erfasst")
+                            .SetFontSize(11)
+                            .SetMarginBottom(0));
+                    }
+                }
+                else
+                {
+                    // If it's not a base64 string, use the old text approach
+                    memberSignatureCell.Add(new Paragraph(model?.Signature ?? "")
+                        .SetFontSize(11)
+                        .SetMarginBottom(0));
+                }
+                
                 memberSignatureCell.Add(new Paragraph("_______________________________")
                     .SetFontSize(11)
-                    .SetMarginTop(-10)
+                    .SetMarginTop(2)
                     .SetMarginBottom(0));
                 memberSignatureCell.Add(new Paragraph("Unterschrift des Neumitgliedes")
                     .SetFontSize(9)
                     .SetMarginTop(0));
                 signaturesTable.AddCell(memberSignatureCell);
 
+                // Add parent signature if available
+                Cell parentSignatureCell = new Cell(1, 1)
+                    .SetBorder(Border.NO_BORDER)
+                    .SetPadding(0);
+                
                 if (model?.ParentSignature != null)
                 {
-                    // Add parent signature if minor
-                    Cell parentSignatureCell = new Cell(1, 1)
-                        .SetBorder(Border.NO_BORDER)
-                        .SetPadding(0);
-                    parentSignatureCell.Add(new Paragraph(model?.ParentSignature ?? " ")
+                    // Check if the parent signature is a base64 string
+                    if (model.ParentSignature.StartsWith("data:image"))
+                    {
+                        try
+                        {
+                            // Extract the base64 data part
+                            string base64Data = model.ParentSignature.Split(',')[1];
+                            byte[] signatureBytes = Convert.FromBase64String(base64Data);
+                            
+                            // Create an image from the signature bytes
+                            Image signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
+                                .SetWidth(150)  // Set width to match the cell width
+                                .SetMarginBottom(2);
+                            
+                            parentSignatureCell.Add(signatureImage);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing parent signature image");
+                            // Fallback to text if there's an error
+                            parentSignatureCell.Add(new Paragraph("Unterschrift digital erfasst")
+                                .SetFontSize(11)
+                                .SetMarginBottom(0));
+                        }
+                    }
+                    else
+                    {
+                        // If it's not a base64 string, use the old text approach
+                        parentSignatureCell.Add(new Paragraph(model.ParentSignature)
+                            .SetFontSize(11)
+                            .SetMarginBottom(0));
+                    }
+                }
+                else
+                {
+                    // Empty signature if not provided
+                    parentSignatureCell.Add(new Paragraph(" ")
                         .SetFontSize(11)
                         .SetMarginBottom(0));
-                    parentSignatureCell.Add(new Paragraph("_______________________________")
-                        .SetFontSize(11)
-                        .SetMarginTop(-10)
-                        .SetMarginBottom(0));
-                    parentSignatureCell.Add(new Paragraph("Unterschrift der Eltern bei Minderjährigen")
-                        .SetFontSize(9)
-                        .SetMarginTop(0));
-                    signaturesTable.AddCell(parentSignatureCell);
                 }
                 
+                parentSignatureCell.Add(new Paragraph("_______________________________")
+                    .SetFontSize(11)
+                    .SetMarginTop(2)
+                    .SetMarginBottom(0));
+                parentSignatureCell.Add(new Paragraph("Unterschrift der Eltern bei Minderjährigen")
+                    .SetFontSize(9)
+                    .SetMarginTop(0));
+                signaturesTable.AddCell(parentSignatureCell);
 
                 document.Add(signaturesTable);
                 
