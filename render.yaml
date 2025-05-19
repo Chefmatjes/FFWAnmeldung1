@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: ffwanmeldung-server
+    env: docker
+    dockerfilePath: ./Server/Dockerfile
+    dockerContext: ./Server
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: PORT
+        value: 8080
+      - key: Email__SmtpServer
+        sync: false
+      - key: Email__SmtpPort
+        sync: false
+      - key: Email__SenderEmail
+        sync: false
+      - key: Email__SenderName
+        sync: false
+      - key: Email__SenderPassword
+        sync: false
+      - key: Email__DefaultRecipientEmail
+        sync: false
+    disk:
+      name: app-data
+      mountPath: /app/data
+      sizeGB: 1
+
+  - type: web
+    name: ffwanmeldung-client
+    env: docker
+    dockerfilePath: ./ClientApp/Dockerfile
+    dockerContext: ./ClientApp
+    plan: starter
+    envVars:
+      - key: NGINX_BACKEND_URL
+        fromService:
+          name: ffwanmeldung-server
+          type: web
+          property: host
+    buildCommand: sed -i "s/server:8080/${NGINX_BACKEND_URL}/g" /etc/nginx/conf.d/default.conf
+    startCommand: nginx -g "daemon off;"
+    domains:
+      - ffwanmeldung-client 
