@@ -83,3 +83,12 @@ _testReports
 
 **/appsettings.local.json
 Server/appsettings.Development.json
+
+# Sensitive configuration
+appsettings.Development.json
+appsettings.Production.json
+.env.local
+.env
+
+# Vercel
+.vercel

@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Server/Server.csproj",
+      "use": "@vercel/dotnet"
+    },
+    {
+      "src": "ClientApp/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Server/Server.csproj"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "ClientApp/$1"
+    }
+  ]
+} 
