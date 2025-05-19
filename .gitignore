@@ -83,3 +83,4 @@ node_modules
 _testReports
 
 **/appsettings.local.json
+Server/appsettings.Development.json
