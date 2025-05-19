@@ -22,4 +22,13 @@ RUN mkdir -p /usr/share/nginx/html/health && \
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"] 
+# Create script to update backend URL at startup
+RUN echo '#!/bin/sh\n\
+if [ -n "$NGINX_BACKEND_URL" ]; then\n\
+  echo "Replacing server:8080 with $NGINX_BACKEND_URL"\n\
+  sed -i "s/server:8080/$NGINX_BACKEND_URL/g" /etc/nginx/conf.d/default.conf\n\
+fi\n\
+nginx -g "daemon off;"\n' > /docker-entrypoint.sh && \
+chmod +x /docker-entrypoint.sh
+
+CMD ["/docker-entrypoint.sh"] 
