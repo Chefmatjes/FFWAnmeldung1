@@ -576,7 +576,7 @@ namespace Server.Controllers
                     .SetMarginTop(30)
                     .Add("Der Mitgliedsbeitrag wird durch ein ")
                     .Add(new Text("SEPA-Lastschriftmandat").SetFont(boldFont))
-                    .Add(" jährlich eingezogen. (Unsere Gläubiger-ID: DE04ZZZ00001520663. Als Mandatsreferenz verwenden Name_Vorname_1 (Bei Namensgleichheit ist die Nummer fortlaufend). ")
+                    .Add(" jährlich eingezogen. (Unsere Gläubiger-ID: DE04ZZZ00001520663. Als Mandatsreferenz verwenden wir Name_Vorname_1 (Bei Namensgleichheit ist die Nummer fortlaufend). ")
                     .Add(new Text("Ich gebe hierzu mein Einverständnis und ermächtige die FFW Apfeltrang e.V. den jeweils fälligen Beitrag einzuziehen.").SetFont(boldFont));
                 
                 document.Add(sepaText);
@@ -779,7 +779,7 @@ namespace Server.Controllers
                 vorsitzenderCell.Add(new Paragraph("Andreas Schneider").SetFont(normalFont).SetFontSize(10));
                 
                 vorsitzenderCell.Add(new Paragraph("Schriftführer:").SetFont(boldFont).SetFontSize(10).SetMarginTop(2));
-                vorsitzenderCell.Add(new Paragraph("Wolfgang Haberlitter").SetFont(normalFont).SetFontSize(10));
+                vorsitzenderCell.Add(new Paragraph("Wolfgang Halbritter").SetFont(normalFont).SetFontSize(10));
                 
                 // Bankverbindung
                 Cell bankverbindungCell = new Cell().SetBorder(Border.NO_BORDER);

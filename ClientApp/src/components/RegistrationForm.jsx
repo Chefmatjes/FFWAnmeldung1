@@ -520,7 +520,7 @@ const RegistrationForm = ({ onSubmit, loading, error }) => {
 
         {/* SEPA-Mandat */}
         <Typography variant="body1" sx={{ mb: 2 }}>
-          Der Mitgliedsbeitrag wird durch ein <strong>SEPA-Lastschriftmandat</strong> jährlich eingezogen. (Unsere Gläubiger-ID: DE04ZZZ00001520663. Als Mandatsreferenz verwenden Name_Vorname_1 (Bei Namensgleichheit ist die Nummer fortlaufend). <strong>Ich gebe hierzu mein Einverständnis und ermächtige die FFW Apfeltrang e.V. den jeweils fälligen Beitrag einzuziehen.</strong>
+          Der Mitgliedsbeitrag wird durch ein <strong>SEPA-Lastschriftmandat</strong> jährlich eingezogen. (Unsere Gläubiger-ID: DE04ZZZ00001520663. Als Mandatsreferenz verwenden wir Name_Vorname_1 (Bei Namensgleichheit ist die Nummer fortlaufend). <strong>Ich gebe hierzu mein Einverständnis und ermächtige die FFW Apfeltrang e.V. den jeweils fälligen Beitrag einzuziehen.</strong>
         </Typography>
 
         {/* Bankdaten */}
@@ -641,7 +641,7 @@ const RegistrationForm = ({ onSubmit, loading, error }) => {
             <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>Kassenwart:</Typography>
             <Typography variant="body2">Andreas Schneider</Typography>
             <Typography variant="body2" fontWeight="bold" sx={{ mt: 1 }}>Schriftführer:</Typography>
-            <Typography variant="body2">Wolfgang Haberlitter</Typography>
+            <Typography variant="body2">Wolfgang Halbritter</Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Typography variant="body2" fontWeight="bold">Bankverbindung:</Typography>
